@@ -1,0 +1,103 @@
+{
+  "name": "decision-ui",
+  "version": "1.0.0",
+  "description": "Gemini Decisions API (gemini-decision-1) control plane, Stitch-style openui-lang compiler, hybrid AST/policy render gate, and 360px/720px multimodal visual critic for OpenChamber",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "bunx openchamber-guest-bundle panel/main.ts panel/main.js && bunx openchamber-guest-bundle blocks/visual.ts blocks/visual.js && bunx openchamber-guest-bundle --node service/main.ts service/main.js && bunx openchamber-guest-bundle --node plugin/src/index.ts plugin/index.js",
+    "check": "bunx openchamber-guest-check",
+    "typecheck": "bun x tsc --noEmit",
+    "test": "bun test"
+  },
+  "openchamber": {
+    "apiVersion": 1,
+    "engines": {
+      "openchamber": ">=2.7.0"
+    },
+    "id": "decision-ui",
+    "name": "Decision UI",
+    "icon": "icon.svg",
+    "contributes": {
+      "capabilities": [
+        "prompt"
+      ],
+      "panel": {
+        "id": "decision-ui-studio",
+        "name": "Decision UI",
+        "icon": "icon.svg",
+        "entry": "panel/index.html"
+      },
+      "service": {
+        "entry": "service/main.js",
+        "runtime": "host",
+        "keepRunning": true,
+        "permissions": {
+          "exec": [
+            "chrome-headless-shell",
+            "google-chrome"
+          ]
+        }
+      },
+      "statusSection": {
+        "source": {
+          "path": "/status",
+          "interval": 4000
+        },
+        "title": "Decision UI"
+      },
+      "sessionEvents": {
+        "events": [
+          "turn-finished"
+        ],
+        "content": true
+      },
+      "opencodePlugin": "plugin",
+      "blocks": [
+        {
+          "name": "AutoVisual",
+          "description": "Pass output/data; Gemini Decision 1 renders an inline chart/stats/steps or keeps it verbatim",
+          "args": [
+            "content",
+            "intent"
+          ],
+          "entry": "blocks/visual.html",
+          "height": 180
+        }
+      ],
+      "actions": [
+        {
+          "id": "visualize-message",
+          "label": "Visualize with Decisions",
+          "icon": "icon.svg",
+          "where": "message",
+          "roles": [
+            "assistant",
+            "user"
+          ],
+          "mode": "open"
+        },
+        {
+          "id": "compile-selection",
+          "label": "Compile to UI block",
+          "icon": "icon.svg",
+          "where": "selection",
+          "display": "both",
+          "mode": "open"
+        }
+      ]
+    }
+  },
+  "dependencies": {
+    "@openchamber/sdk": "2.7.0"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.4.4",
+    "@types/node": "^26.6.6",
+    "typescript": "^7.0.2"
+  },
+  "peerDependencies": {
+    "typescript": "^7"
+  }
+}
